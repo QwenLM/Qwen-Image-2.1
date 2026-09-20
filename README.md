@@ -39,6 +39,7 @@ Four key improvements define this release:
 
 ```bash
 pip install torch>=2.4.0
+pip install torchvision
 pip install transformers>=5.17
 pip install git+https://github.com/huggingface/diffusers
 pip install accelerate
