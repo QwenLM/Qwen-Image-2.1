@@ -169,7 +169,7 @@ image = pipe(
 
 ## Prompt Rewriting
 
-For best results, we recommend using the official **prompt rewriting models** to expand short prompts into detailed, high-quality descriptions. Two fine-tuned Qwen3.5-VL 9B checkpoints are provided — one for text-to-image, one for image editing — sharing a unified codebase that auto-detects the mode from input.
+For best results, we recommend using the official **prompt rewriting models** to expand short prompts into detailed, high-quality descriptions. Two fine-tuned Qwen3.5-VL 9B checkpoints are provided — one for text-to-image, one for image editing — sharing a unified codebase with the mode selected by `--task`.
 
 The rewriting code and weights are available at:
 - **T2I**: [Qwen/Qwen-Image-2.1-PE-T2I](https://huggingface.co/Qwen/Qwen-Image-2.1-PE-T2I)
@@ -182,6 +182,7 @@ prompt_rewrite/
 ├── run_vllm.py               # vLLM offline batch (recommended at scale)
 ├── serve.sh + client.py      # vLLM server + client
 ├── pe_core.py                # Task profiles, parsing, output records
+├── prompts/                  # Official system prompts for explicit local use
 ├── requirements.txt
 └── data/                     # Example inputs (t2i + edit with images)
 ```
@@ -203,12 +204,13 @@ python run_transformers.py --task t2i \
     --input data/t2i_example.jsonl --output out.jsonl
 ```
 
-Output:
+Output fields (the full JSONL record also includes input metadata and thinking):
 
 ```json
 {
-  "rewritten_prompt": "<long detailed English prompt>",
-  "wh_ratio": "16:9"
+  "positive_prompt": "<long detailed English prompt>",
+  "wh_ratio": "16:9",
+  "parse_ok": true
 }
 ```
 
@@ -226,13 +228,14 @@ Input format (JSONL):
 {"id": "abc123", "prompt": "make the sky sunset", "input_images": ["images/photo.png"]}
 ```
 
-Output:
+Output fields:
 
 ```json
 {
-  "rewritten_prompt": "Replace the daytime sky with a warm sunset ...",
+  "positive_prompt": "Replace the daytime sky with a warm sunset ...",
   "wh_ratio": "",
-  "ratio_follow": "<image1>"
+  "ratio_follow": "<image1>",
+  "parse_ok": true
 }
 ```
 
@@ -248,7 +251,17 @@ python client.py --task t2i --model Qwen/Qwen-Image-2.1-PE-T2I \
     "a corgi playing guitar in the rain"
 ```
 
+The runners and client load `system_prompt.txt` from the checkpoint's local
+directory or Hugging Face Hub repository. Use `--system-prompt <file>` to
+override it, or when the server uses a custom `NAME` alias. See
+[`prompt_rewrite/README.md`](./prompt_rewrite/README.md) for local prompt files
+and server naming details.
+
 ### Integration with the Pipeline
+
+Use `positive_prompt` from the rewriter's output record. `rewritten_prompt` is
+the model's internal answer field, which the scripts normalize to
+`positive_prompt`.
 
 ```python
 import json
@@ -261,9 +274,12 @@ WH_RATIO_TO_SIZE = {
     "9:16": (1536, 2752),
 }
 
-# After running the rewriter, read the output
-rewrite = {"rewritten_prompt": "...", "wh_ratio": "16:9"}  # from run_vllm.py output
-prompt = rewrite["rewritten_prompt"]
+# After running the t2i rewriter, read the first output record
+with open("out.jsonl", encoding="utf-8") as f:
+    rewrite = json.loads(next(f))
+if not rewrite["parse_ok"]:
+    raise ValueError("Prompt rewriting failed to produce the expected JSON answer")
+prompt = rewrite["positive_prompt"]
 width, height = WH_RATIO_TO_SIZE.get(rewrite["wh_ratio"], (2048, 2048))
 
 pipe = QwenImage21Pipeline.from_pretrained(

@@ -110,7 +110,7 @@ def get_profile(task: str) -> Profile:
 # --------------------------------------------------------------------------- #
 def load_system_prompt(explicit: str | None, ckpt: str | None) -> str:
     """Resolve the system prompt: `--system-prompt` wins, else the checkpoint's
-    own `system_prompt.txt`.
+    own `system_prompt.txt`, from a local directory or the Hugging Face Hub.
 
     Preferring the file that ships *inside* the checkpoint is deliberate. The
     expert's answer contract is part of what the weights were trained on, so a
@@ -124,8 +124,27 @@ def load_system_prompt(explicit: str | None, ckpt: str | None) -> str:
             raise SystemExit(f"--system-prompt {explicit!r} is not a file")
         return path.read_text(encoding="utf-8").strip()
     if ckpt:
-        path = Path(ckpt) / "system_prompt.txt"
+        checkpoint = Path(ckpt)
+        path = checkpoint / "system_prompt.txt"
         if path.is_file():
+            return path.read_text(encoding="utf-8").strip()
+        # Existing local checkpoints must not fall through to a similarly named
+        # Hub repository when their prompt is missing.
+        is_local = (checkpoint.exists() or checkpoint.is_absolute()
+                    or ckpt.startswith(("./", "../", "~")))
+        if not is_local:
+            # Lazy import: explicit files and local checkpoints need no Hub client.
+            from huggingface_hub import hf_hub_download
+            from huggingface_hub.errors import (HFValidationError, HfHubHTTPError,
+                                                LocalEntryNotFoundError)
+
+            try:
+                path = Path(hf_hub_download(repo_id=ckpt, filename="system_prompt.txt"))
+            except (HFValidationError, HfHubHTTPError, LocalEntryNotFoundError, OSError) as exc:
+                raise SystemExit(
+                    f"cannot load system_prompt.txt from {ckpt!r}: {exc}. "
+                    "Pass --system-prompt <file> with the prompt for this checkpoint."
+                ) from exc
             return path.read_text(encoding="utf-8").strip()
     raise SystemExit(
         "no system prompt: pass --system-prompt <file>, or put system_prompt.txt "

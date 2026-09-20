@@ -12,9 +12,9 @@ once and runs the whole JSONL through `LLM.chat()`.
     python run_vllm.py --task edit --ckpt Qwen/Qwen-Image-2.1-PE-I2I \\
         --input data/edit_example.jsonl --output out.jsonl
 
-The system prompt comes from the checkpoint's own `system_prompt.txt`, or from
-`--system-prompt <file>`. The two tasks have separate prompts; there is no
-unified one.
+The system prompt comes from the checkpoint's own `system_prompt.txt` (local
+directory or Hugging Face Hub), or from `--system-prompt <file>`. The two tasks
+have separate prompts; there is no unified one.
 """
 
 from __future__ import annotations
@@ -55,7 +55,8 @@ def main() -> int:
                     help="JSONL: {id, prompt, input_images?, task_type?}.")
     ap.add_argument("--output", required=True, help="Output JSONL.")
     ap.add_argument("--system-prompt", default=None,
-                    help="System prompt file (default: <ckpt>/system_prompt.txt).")
+                    help="System prompt file (default: system_prompt.txt from "
+                         "--ckpt, as a local directory or Hub id).")
     ap.add_argument("--tp", type=int, default=1, help="Tensor-parallel size.")
     ap.add_argument("--dtype", default="bfloat16")
     ap.add_argument("--max-model-len", type=int, default=24576)
