@@ -203,14 +203,17 @@ python run_transformers.py --task t2i \
     --input data/t2i_example.jsonl --output out.jsonl
 ```
 
-Output:
+Each line of `out.jsonl` is one record. The fields used downstream:
 
 ```json
 {
-  "rewritten_prompt": "<long detailed English prompt>",
-  "wh_ratio": "16:9"
+  "positive_prompt": "<long detailed English prompt>",
+  "wh_ratio": "16:9",
+  "parse_ok": true
 }
 ```
+
+See [`prompt_rewrite/README.md`](./prompt_rewrite/README.md#output-format) for the full record.
 
 ### Image Editing
 
@@ -226,13 +229,14 @@ Input format (JSONL):
 {"id": "abc123", "prompt": "make the sky sunset", "input_images": ["images/photo.png"]}
 ```
 
-Output:
+Output record (fields used downstream):
 
 ```json
 {
-  "rewritten_prompt": "Replace the daytime sky with a warm sunset ...",
+  "positive_prompt": "Replace the daytime sky with a warm sunset ...",
   "wh_ratio": "",
-  "ratio_follow": "<image1>"
+  "ratio_follow": "<image1>",
+  "parse_ok": true
 }
 ```
 
@@ -261,9 +265,10 @@ WH_RATIO_TO_SIZE = {
     "9:16": (1536, 2752),
 }
 
-# After running the rewriter, read the output
-rewrite = {"rewritten_prompt": "...", "wh_ratio": "16:9"}  # from run_vllm.py output
-prompt = rewrite["rewritten_prompt"]
+# After running the rewriter, read a record from its output
+with open("out.jsonl", encoding="utf-8") as f:  # written by run_vllm.py
+    rewrite = json.loads(f.readline())
+prompt = rewrite["positive_prompt"]
 width, height = WH_RATIO_TO_SIZE.get(rewrite["wh_ratio"], (2048, 2048))
 
 pipe = QwenImage21Pipeline.from_pretrained(
