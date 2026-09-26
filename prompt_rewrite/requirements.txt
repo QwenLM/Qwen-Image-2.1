@@ -1,6 +1,7 @@
 # Pinned to the environment these reference impls were tested with.
-# transformers 5.4 is required for the qwen3_5 architecture; vllm 0.19.1 matches it.
-transformers==5.4.0
+# transformers 5.4+ is required for the qwen3_5 architecture, and vllm 0.19.1
+# requires transformers>5.5.0, so this pins the latest 5.5 patch release.
+transformers==5.5.4
 tokenizers==0.22.1
 huggingface_hub==1.27.0
 accelerate==1.11.0

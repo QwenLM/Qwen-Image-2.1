@@ -1,0 +1,66 @@
+# Qwen-Image-2.1 Studio configuration.
+#
+# Put your own overrides in config.local.toml next to this file (same keys, only the
+# ones you want to change). That file is git-ignored. Restart the app after editing.
+# Relative paths are resolved from the repository root.
+
+[server]
+# 127.0.0.1 keeps the app private to this machine (use an SSH tunnel for a remote GPU).
+host = "127.0.0.1"
+port = 7860
+# true creates a temporary public gradio.live link.
+share = false
+
+[pipeline]
+# Hub id or a local diffusers folder.
+model = "Qwen/Qwen-Image-2.1"
+device = "cuda"
+dtype = "bfloat16"
+# none        keep the whole model on the GPU (fastest, about 33 GB of weights, about 57 GB peak at 2K)
+# model       move each component to the GPU only while it runs (slower, much less VRAM)
+# sequential  stream layers to the GPU one by one (very slow, lowest VRAM)
+offload = "none"
+# Load the image model at startup instead of on the first generation.
+preload = false
+
+[enhancer]
+# The official prompt enhancers, served by prompt_rewrite/serve.sh (vLLM).
+# Each server starts on first use (about 1 to 2 minutes) and then answers quickly.
+t2i_model = "Qwen/Qwen-Image-2.1-PE-T2I"
+edit_model = "Qwen/Qwen-Image-2.1-PE-I2I"
+# Python of the environment that has vLLM (prompt_rewrite/requirements.txt).
+# Empty means the same Python that runs this app.
+python = ""
+t2i_port = 8100
+edit_port = 8101
+# Fraction of the whole GPU each enhancer server reserves (about 18 GB of weights plus
+# the KV cache). The edit enhancer needs more for its vision encoder and CUDA graphs.
+t2i_gpu_memory_utilization = 0.35
+edit_gpu_memory_utilization = 0.45
+# Context length. The edit profile allows 24000 output tokens, so its server needs room
+# for that plus the prompt and up to 10 images.
+t2i_max_model_len = 24576
+edit_max_model_len = 40960
+# Keep a started enhancer running between uses. The app still stops it when the image
+# model needs the VRAM, and parks the image model in CPU RAM when an enhancer needs the
+# VRAM. false stops the enhancer right after every use.
+keep_running = true
+# Run only one enhancer server at a time.
+one_at_a_time = true
+# Seconds to wait for an enhancer server to become ready.
+startup_timeout = 600
+
+[defaults]
+steps = 40
+# 1K | 1.5K | 2K
+t2i_resolution = "2K"
+edit_resolution = "1K"
+aspect_ratio = "1:1"
+seed = 42
+random_seed = true
+num_images = 1
+
+[output]
+# Every result is saved here as a PNG plus a JSON file with all settings.
+dir = "studio/outputs"
+save = true

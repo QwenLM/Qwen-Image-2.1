@@ -17,7 +17,9 @@ what makes one codebase honest rather than merely convenient.
 interchangeable and there is no merged prompt: the answer contract is part of
 what each model was trained on. Point `--ckpt` at one and give it that model's
 prompt (via `--system-prompt`, or ship it as `system_prompt.txt` inside the
-checkpoint directory and it is picked up automatically).
+checkpoint directory and it is picked up automatically). A Hub id such as
+`Qwen/Qwen-Image-2.1-PE-T2I` works the same way: its `system_prompt.txt` is
+downloaded from the same repo as the weights.
 
 Pointing `--ckpt` at the official open-source Qwen3.5-VL 9B release will load and
 generate, but it was never trained against either system prompt, so it does not
@@ -43,7 +45,7 @@ a file.
 pip install -r requirements.txt
 ```
 
-Tested with `transformers==5.4.0`, `vllm==0.19.1`, `torch==2.10.0+cu128` on CUDA
+Tested with `transformers==5.5.4`, `vllm==0.19.1`, `torch==2.10.0+cu128` on CUDA
 12.x. The checkpoint loads through `AutoModelForImageTextToText`, which
 dispatches on `config.model_type` (`qwen3_5` here).
 
@@ -159,9 +161,13 @@ Online, when you want an endpoint:
 CKPT=Qwen/Qwen-Image-2.1-PE-T2I PORT=8100 bash serve.sh
 # in another shell, once `curl -sf localhost:8100/health` answers:
 python client.py --task t2i --model Qwen/Qwen-Image-2.1-PE-T2I \
-    --system-prompt Qwen/Qwen-Image-2.1-PE-T2I/system_prompt.txt \
+    --system-prompt prompts/system_prompt_t2i.txt \
     "a corgi playing guitar in the rain"
 ```
+
+The server holds the weights but not the system prompt, so `client.py` always
+needs `--system-prompt`. `prompts/` has a copy of each checkpoint's
+`system_prompt.txt`: `system_prompt_t2i.txt` and `system_prompt_edit.txt`.
 
 `client.py` also takes `--input/--output` for a batch over HTTP, and `--image`
 (repeatable, in order) for a single `edit` request.

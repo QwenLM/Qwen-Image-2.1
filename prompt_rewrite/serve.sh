@@ -8,8 +8,8 @@
 #   CKPT=Qwen/Qwen-Image-2.1-PE-I2I GPUS=0,1 PORT=8100 bash serve.sh
 #
 # Environment (all optional):
-#   CKPT       checkpoint dir                 (required, no default on purpose)
-#   NAME       served model name              default: basename of CKPT
+#   CKPT       checkpoint dir or Hub id       (required, no default on purpose)
+#   NAME       served model name              default: the Hub id, or basename of a dir
 #   PORT       listen port                    default 8100
 #   GPUS       CUDA_VISIBLE_DEVICES           default 0..TP-1
 #   TP         tensor-parallel size           default = #visible GPUs, in {1,2,4,8}
@@ -29,9 +29,11 @@
 set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-CKPT="${CKPT:?CKPT must point at the checkpoint directory}"
-[ -d "$CKPT" ] || { echo "CKPT $CKPT is not a directory" >&2; exit 2; }
-NAME="${NAME:-$(basename "$CKPT")}"
+CKPT="${CKPT:?CKPT must be a checkpoint directory or a Hub id}"
+# A Hub id is served under its full id, so clients pass the same string as --model.
+if [ -d "$CKPT" ]; then NAME="${NAME:-$(basename "$CKPT")}"
+elif [[ "$CKPT" =~ ^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$ ]]; then NAME="${NAME:-$CKPT}"
+else echo "CKPT $CKPT is neither a directory nor a Hub id" >&2; exit 2; fi
 PORT="${PORT:-8100}"
 PY="${PY:-python}"
 MAX_LEN="${MAX_LEN:-24576}"

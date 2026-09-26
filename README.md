@@ -52,7 +52,7 @@ import torch
 from diffusers import QwenImage21Pipeline
 
 pipe = QwenImage21Pipeline.from_pretrained(
-    "Qwen/Qwen-Image-2.1", torch_dtype=torch.bfloat16
+    "Qwen/Qwen-Image-2.1", dtype=torch.bfloat16
 ).to("cuda")
 
 image = pipe(
@@ -72,7 +72,7 @@ from PIL import Image
 from diffusers import QwenImage21Pipeline
 
 pipe = QwenImage21Pipeline.from_pretrained(
-    "Qwen/Qwen-Image-2.1", torch_dtype=torch.bfloat16
+    "Qwen/Qwen-Image-2.1", dtype=torch.bfloat16
 ).to("cuda")
 
 input_image = Image.open("input.png")
@@ -97,7 +97,7 @@ from PIL import Image
 from diffusers import QwenImage21Pipeline
 
 pipe = QwenImage21Pipeline.from_pretrained(
-    "Qwen/Qwen-Image-2.1", torch_dtype=torch.bfloat16
+    "Qwen/Qwen-Image-2.1", dtype=torch.bfloat16
 ).to("cuda")
 
 images = [Image.open(f"ref_{i}.png") for i in range(3)]
@@ -123,7 +123,7 @@ import torch
 from diffusers import QwenImage21Pipeline
 
 pipe = QwenImage21Pipeline.from_pretrained(
-    "Qwen/Qwen-Image-2.1", torch_dtype=torch.bfloat16
+    "Qwen/Qwen-Image-2.1", dtype=torch.bfloat16
 ).to("cuda")
 
 image = pipe(
@@ -167,6 +167,15 @@ image = pipe(
 | `num_inference_steps` | 40 | Number of denoising steps |
 | `width` / `height` | 2048 × 2048 | Native 2K resolution; see aspect ratio table above |
 
+### Gradio Studio
+
+[`studio/`](./studio/) is a local web app for trying every feature above in the browser: text to image, editing with up to 10 reference images, local edits drawn on the image, transparent output and the prompt enhancers. Jobs keep running when you switch tabs or reload the page.
+
+```bash
+pip install -r studio/requirements.txt
+bash studio/run.sh
+```
+
 ## Prompt Rewriting
 
 For best results, we recommend using the official **prompt rewriting models** to expand short prompts into detailed, high-quality descriptions. Two fine-tuned Qwen3.5-VL 9B checkpoints are provided — one for text-to-image, one for image editing — sharing a unified codebase that auto-detects the mode from input.
@@ -183,6 +192,7 @@ prompt_rewrite/
 ├── serve.sh + client.py      # vLLM server + client
 ├── pe_core.py                # Task profiles, parsing, output records
 ├── requirements.txt
+├── prompts/                  # System prompt for each task
 └── data/                     # Example inputs (t2i + edit with images)
 ```
 
@@ -203,14 +213,17 @@ python run_transformers.py --task t2i \
     --input data/t2i_example.jsonl --output out.jsonl
 ```
 
-Output:
+Each line of `out.jsonl` is one record. The fields used downstream:
 
 ```json
 {
-  "rewritten_prompt": "<long detailed English prompt>",
-  "wh_ratio": "16:9"
+  "positive_prompt": "<long detailed English prompt>",
+  "wh_ratio": "16:9",
+  "parse_ok": true
 }
 ```
+
+See [`prompt_rewrite/README.md`](./prompt_rewrite/README.md#output-format) for the full record.
 
 ### Image Editing
 
@@ -226,13 +239,14 @@ Input format (JSONL):
 {"id": "abc123", "prompt": "make the sky sunset", "input_images": ["images/photo.png"]}
 ```
 
-Output:
+Output record (fields used downstream):
 
 ```json
 {
-  "rewritten_prompt": "Replace the daytime sky with a warm sunset ...",
+  "positive_prompt": "Replace the daytime sky with a warm sunset ...",
   "wh_ratio": "",
-  "ratio_follow": "<image1>"
+  "ratio_follow": "<image1>",
+  "parse_ok": true
 }
 ```
 
@@ -245,6 +259,7 @@ Output:
 CKPT=Qwen/Qwen-Image-2.1-PE-T2I bash serve.sh
 # then:
 python client.py --task t2i --model Qwen/Qwen-Image-2.1-PE-T2I \
+    --system-prompt prompts/system_prompt_t2i.txt \
     "a corgi playing guitar in the rain"
 ```
 
@@ -261,13 +276,14 @@ WH_RATIO_TO_SIZE = {
     "9:16": (1536, 2752),
 }
 
-# After running the rewriter, read the output
-rewrite = {"rewritten_prompt": "...", "wh_ratio": "16:9"}  # from run_vllm.py output
-prompt = rewrite["rewritten_prompt"]
+# After running the rewriter, read a record from its output
+with open("out.jsonl", encoding="utf-8") as f:  # written by run_vllm.py
+    rewrite = json.loads(f.readline())
+prompt = rewrite["positive_prompt"]
 width, height = WH_RATIO_TO_SIZE.get(rewrite["wh_ratio"], (2048, 2048))
 
 pipe = QwenImage21Pipeline.from_pretrained(
-    "Qwen/Qwen-Image-2.1", torch_dtype=torch.bfloat16
+    "Qwen/Qwen-Image-2.1", dtype=torch.bfloat16
 ).to("cuda")
 
 image = pipe(
@@ -288,7 +304,7 @@ For GPUs with limited memory, use model offloading:
 
 ```python
 pipe = QwenImage21Pipeline.from_pretrained(
-    "Qwen/Qwen-Image-2.1", torch_dtype=torch.bfloat16
+    "Qwen/Qwen-Image-2.1", dtype=torch.bfloat16
 )
 pipe.enable_model_cpu_offload()
 ```

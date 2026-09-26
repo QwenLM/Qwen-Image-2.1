@@ -1,0 +1,13 @@
+# Studio app and the image pipeline. Tested with torch 2.14, transformers 5.17,
+# diffusers main (0.41.0.dev0), gradio 6.28 and openai 2.21.
+torch>=2.4.0
+transformers>=5.17
+diffusers @ git+https://github.com/huggingface/diffusers
+accelerate
+pillow
+gradio>=6.28,<7
+openai>=2.21,<3
+
+# The optional prompt enhancers run in their own environment, because vLLM pins an
+# older transformers: see ../prompt_rewrite/requirements.txt and enhancer.python in
+# config.toml.
