@@ -38,7 +38,7 @@ Four key improvements define this release:
 ### Requirements
 
 ```bash
-pip install torch>=2.4.0
+pip install torch>=2.14.0
 pip install transformers>=5.17
 pip install git+https://github.com/huggingface/diffusers
 pip install accelerate
