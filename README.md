@@ -52,7 +52,7 @@ import torch
 from diffusers import QwenImage21Pipeline
 
 pipe = QwenImage21Pipeline.from_pretrained(
-    "Qwen/Qwen-Image-2.1", torch_dtype=torch.bfloat16
+    "Qwen/Qwen-Image-2.1", dtype=torch.bfloat16
 ).to("cuda")
 
 image = pipe(
@@ -72,7 +72,7 @@ from PIL import Image
 from diffusers import QwenImage21Pipeline
 
 pipe = QwenImage21Pipeline.from_pretrained(
-    "Qwen/Qwen-Image-2.1", torch_dtype=torch.bfloat16
+    "Qwen/Qwen-Image-2.1", dtype=torch.bfloat16
 ).to("cuda")
 
 input_image = Image.open("input.png")
@@ -97,7 +97,7 @@ from PIL import Image
 from diffusers import QwenImage21Pipeline
 
 pipe = QwenImage21Pipeline.from_pretrained(
-    "Qwen/Qwen-Image-2.1", torch_dtype=torch.bfloat16
+    "Qwen/Qwen-Image-2.1", dtype=torch.bfloat16
 ).to("cuda")
 
 images = [Image.open(f"ref_{i}.png") for i in range(3)]
@@ -123,7 +123,7 @@ import torch
 from diffusers import QwenImage21Pipeline
 
 pipe = QwenImage21Pipeline.from_pretrained(
-    "Qwen/Qwen-Image-2.1", torch_dtype=torch.bfloat16
+    "Qwen/Qwen-Image-2.1", dtype=torch.bfloat16
 ).to("cuda")
 
 image = pipe(
@@ -267,7 +267,7 @@ prompt = rewrite["rewritten_prompt"]
 width, height = WH_RATIO_TO_SIZE.get(rewrite["wh_ratio"], (2048, 2048))
 
 pipe = QwenImage21Pipeline.from_pretrained(
-    "Qwen/Qwen-Image-2.1", torch_dtype=torch.bfloat16
+    "Qwen/Qwen-Image-2.1", dtype=torch.bfloat16
 ).to("cuda")
 
 image = pipe(
@@ -288,7 +288,7 @@ For GPUs with limited memory, use model offloading:
 
 ```python
 pipe = QwenImage21Pipeline.from_pretrained(
-    "Qwen/Qwen-Image-2.1", torch_dtype=torch.bfloat16
+    "Qwen/Qwen-Image-2.1", dtype=torch.bfloat16
 )
 pipe.enable_model_cpu_offload()
 ```
