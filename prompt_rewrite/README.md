@@ -17,7 +17,9 @@ what makes one codebase honest rather than merely convenient.
 interchangeable and there is no merged prompt: the answer contract is part of
 what each model was trained on. Point `--ckpt` at one and give it that model's
 prompt (via `--system-prompt`, or ship it as `system_prompt.txt` inside the
-checkpoint directory and it is picked up automatically).
+checkpoint directory and it is picked up automatically). A Hub id such as
+`Qwen/Qwen-Image-2.1-PE-T2I` works the same way: its `system_prompt.txt` is
+downloaded from the same repo as the weights.
 
 Pointing `--ckpt` at the official open-source Qwen3.5-VL 9B release will load and
 generate, but it was never trained against either system prompt, so it does not
