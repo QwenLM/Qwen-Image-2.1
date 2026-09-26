@@ -161,9 +161,13 @@ Online, when you want an endpoint:
 CKPT=Qwen/Qwen-Image-2.1-PE-T2I PORT=8100 bash serve.sh
 # in another shell, once `curl -sf localhost:8100/health` answers:
 python client.py --task t2i --model Qwen/Qwen-Image-2.1-PE-T2I \
-    --system-prompt Qwen/Qwen-Image-2.1-PE-T2I/system_prompt.txt \
+    --system-prompt prompts/system_prompt_t2i.txt \
     "a corgi playing guitar in the rain"
 ```
+
+The server holds the weights but not the system prompt, so `client.py` always
+needs `--system-prompt`. `prompts/` has a copy of each checkpoint's
+`system_prompt.txt`: `system_prompt_t2i.txt` and `system_prompt_edit.txt`.
 
 `client.py` also takes `--input/--output` for a batch over HTTP, and `--image`
 (repeatable, in order) for a single `edit` request.

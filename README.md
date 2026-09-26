@@ -183,6 +183,7 @@ prompt_rewrite/
 ├── serve.sh + client.py      # vLLM server + client
 ├── pe_core.py                # Task profiles, parsing, output records
 ├── requirements.txt
+├── prompts/                  # System prompt for each task
 └── data/                     # Example inputs (t2i + edit with images)
 ```
 
@@ -249,6 +250,7 @@ Output record (fields used downstream):
 CKPT=Qwen/Qwen-Image-2.1-PE-T2I bash serve.sh
 # then:
 python client.py --task t2i --model Qwen/Qwen-Image-2.1-PE-T2I \
+    --system-prompt prompts/system_prompt_t2i.txt \
     "a corgi playing guitar in the rain"
 ```
 
