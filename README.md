@@ -167,6 +167,15 @@ image = pipe(
 | `num_inference_steps` | 40 | Number of denoising steps |
 | `width` / `height` | 2048 × 2048 | Native 2K resolution; see aspect ratio table above |
 
+### Gradio Studio
+
+[`studio/`](./studio/) is a local web app for trying every feature above in the browser: text to image, editing with up to 10 reference images, local edits drawn on the image, transparent output and the prompt enhancers. Jobs keep running when you switch tabs or reload the page.
+
+```bash
+pip install -r studio/requirements.txt
+bash studio/run.sh
+```
+
 ## Prompt Rewriting
 
 For best results, we recommend using the official **prompt rewriting models** to expand short prompts into detailed, high-quality descriptions. Two fine-tuned Qwen3.5-VL 9B checkpoints are provided — one for text-to-image, one for image editing — sharing a unified codebase that auto-detects the mode from input.
