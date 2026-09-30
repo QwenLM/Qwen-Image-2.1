@@ -8,8 +8,8 @@
 #   CKPT=Qwen/Qwen-Image-2.1-PE-I2I GPUS=0,1 PORT=8100 bash serve.sh
 #
 # Environment (all optional):
-#   CKPT       checkpoint dir                 (required, no default on purpose)
-#   NAME       served model name              default: basename of CKPT
+#   CKPT       local checkpoint dir or Hub id (required, no default on purpose)
+#   NAME       served model name              default: basename for a local dir, else CKPT
 #   PORT       listen port                    default 8100
 #   GPUS       CUDA_VISIBLE_DEVICES           default 0..TP-1
 #   TP         tensor-parallel size           default = #visible GPUs, in {1,2,4,8}
@@ -29,9 +29,14 @@
 set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-CKPT="${CKPT:?CKPT must point at the checkpoint directory}"
-[ -d "$CKPT" ] || { echo "CKPT $CKPT is not a directory" >&2; exit 2; }
-NAME="${NAME:-$(basename "$CKPT")}"
+CKPT="${CKPT:?CKPT must be a local checkpoint directory or Hugging Face Hub id}"
+# Let vLLM resolve Hub ids as it does for offline inference. Preserve the local
+# directory naming convention, but keep Hub ids intact to match client --model.
+if [ -d "$CKPT" ]; then
+    NAME="${NAME:-$(basename "$CKPT")}"
+else
+    NAME="${NAME:-$CKPT}"
+fi
 PORT="${PORT:-8100}"
 PY="${PY:-python}"
 MAX_LEN="${MAX_LEN:-24576}"

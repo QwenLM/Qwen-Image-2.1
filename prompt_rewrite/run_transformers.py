@@ -98,7 +98,8 @@ def main() -> int:
                     help="JSONL: {id, prompt, input_images?, task_type?}.")
     ap.add_argument("--output", required=True, help="Output JSONL.")
     ap.add_argument("--system-prompt", default=None,
-                    help="System prompt file (default: <ckpt>/system_prompt.txt).")
+                    help="System prompt file (default: system_prompt.txt from "
+                         "--ckpt, as a local directory or Hub id).")
     ap.add_argument("--dtype", default="bfloat16",
                     choices=["bfloat16", "float16", "float32"])
     ap.add_argument("--device", default="cuda")

@@ -17,7 +17,21 @@ what makes one codebase honest rather than merely convenient.
 interchangeable and there is no merged prompt: the answer contract is part of
 what each model was trained on. Point `--ckpt` at one and give it that model's
 prompt (via `--system-prompt`, or ship it as `system_prompt.txt` inside the
-checkpoint directory and it is picked up automatically).
+checkpoint directory or Hub repository and it is picked up automatically).
+
+Prompt resolution is the same for both offline runners and the HTTP client:
+
+1. `--system-prompt <file>` overrides the checkpoint prompt.
+2. A local checkpoint directory uses its own `system_prompt.txt`.
+3. A Hugging Face Hub ID downloads only `system_prompt.txt` through the Hub
+   cache. This honors the usual Hub authentication and `HF_HUB_OFFLINE` settings.
+
+Both official Hub checkpoints include this file. For a custom server alias,
+pass `--system-prompt` explicitly: the client cannot infer the checkpoint behind
+an alias. Local checkpoint directories with missing prompts fail rather than
+falling back to another model's prompt. The official prompts are also included
+in `prompts/system_prompt_t2i.txt` and `prompts/system_prompt_edit.txt` for explicit
+use without a Hub download.
 
 Pointing `--ckpt` at the official open-source Qwen3.5-VL 9B release will load and
 generate, but it was never trained against either system prompt, so it does not
@@ -159,8 +173,20 @@ Online, when you want an endpoint:
 CKPT=Qwen/Qwen-Image-2.1-PE-T2I PORT=8100 bash serve.sh
 # in another shell, once `curl -sf localhost:8100/health` answers:
 python client.py --task t2i --model Qwen/Qwen-Image-2.1-PE-T2I \
-    --system-prompt Qwen/Qwen-Image-2.1-PE-T2I/system_prompt.txt \
     "a corgi playing guitar in the rain"
+```
+
+For Hub checkpoints, the default served model name is the full Hub ID. Local
+checkpoint directories retain their basename as the default name. `NAME` can
+override either; pass that same value as the client's `--model` and provide the
+matching prompt explicitly:
+
+```bash
+CKPT=Qwen/Qwen-Image-2.1-PE-I2I NAME=pe-edit bash serve.sh
+# in another shell:
+python client.py --task edit --model pe-edit \
+    --system-prompt prompts/system_prompt_edit.txt \
+    --image data/images/1412128.png "make the sky sunset"
 ```
 
 `client.py` also takes `--input/--output` for a batch over HTTP, and `--image`
@@ -226,3 +252,15 @@ cannot land on one task and miss the other.
 **Sockets.** Clusters often preset `GLOO_SOCKET_IFNAME` / `TP_SOCKET_IFNAME` to
 interfaces that do not exist on the current host, which kills vLLM on init. Both
 the runner and `serve.sh` unset any that name a missing interface.
+
+## Tests
+
+From the repository root:
+
+```bash
+python -m unittest discover -s prompt_rewrite/tests -v
+```
+
+These tests need only `huggingface_hub` and `openai` from `requirements.txt`.
+They cover prompt resolution, client requests, and the server launch command
+with mocked downloads and inference; no network, model weights, or GPU is needed.
