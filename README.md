@@ -553,6 +553,10 @@ ModelScope fully supports Qwen-Image-2.1. Built on its open-source [DiffSynth-St
 
 Get ready to run Qwen-Image 2.1 on AMD Radeon GPU. With ROCm, PyTorch, and Diffusers, developers can easily explore high-quality text-to-image generation on AMD GPUs.
 
+### Apple Silicon
+
+Run Qwen-Image-2.1-Turbo locally on Apple Silicon with [LightX2V-Mac-App](https://github.com/ModelTC/LightX2V-Mac-App), a native macOS app powered by [LightX2V](https://github.com/ModelTC/LightX2V) for text-to-image and image-to-image generation, with optional prompt enhancement. Visit the [LightX2V-Mac-App](https://github.com/ModelTC/LightX2V-Mac-App) repository to download the stable app.
+
 ### Diverse AI Chips via FlagOS
 
 [FlagOS](https://github.com/flagos-ai) is a fully open-source system software stack for heterogeneous AI chips. It unifies the model–system–chip layers to enable a "develop once, run anywhere" workflow, eliminating the fragmentation among vendor-specific software stacks and substantially lowering the cost of porting AI workloads across accelerators.
