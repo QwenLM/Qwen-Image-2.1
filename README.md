@@ -111,7 +111,7 @@ import torch
 from diffusers import QwenImage21Pipeline
 
 pipe = QwenImage21Pipeline.from_pretrained(
-    "Qwen/Qwen-Image-2.1", torch_dtype=torch.bfloat16
+    "Qwen/Qwen-Image-2.1", dtype=torch.bfloat16
 ).to("cuda")
 
 prompt = "A vertically oriented educational chemistry study poster fills the frame, designed like a hand-drawn classroom notes page with a clean white background, thick dark navy-blue outer border, and thin inner navy rectangular border lines. The overall aesthetic is colorful, high-contrast, and hand-lettered in a signature Topper style using marker and watercolor effects. At the top left, a small header in black handwriting reads \"Topper’s Notes\", accented by short decorative navy strokes radiating from it. Centered across the top is the main lesson heading in large stylized black-and-yellow bold lettering: \"Science – Chapter 1:\" followed below by the much larger title \"Chemical Reactions and Equations\". The title has energetic yellow highlighter strokes underneath and small sparkle doodles nearby. At the top right, inside a small outlined page-number box, the label reads \"Page X\". Below the header, a wide rounded rectangle framed in dark navy contains a pink brush-stroke highlight banner with the subheading \"IMPORTANT CHEMICAL EQUATION:\" in black. Inside the same equation panel, the reaction is written very large as \"Fe + CuSO₄ → FeSO₄ + Cu\". The symbol \"Fe\" is highlighted in bright orange with an underline, \"CuSO₄\" is vivid blue and underlined, \"FeSO₄\" is bright green and underlined, and \"Cu\" is metallic bronze and underlined. Beneath the left side of the equation is a lavender rounded label connected by a leader line to the iron component; it says \"Reactants\" and below it \"(before the reaction)\", with \"Reactants\" colored purple and underlined. Beneath the right side is a matching pale-green rounded label connected by a leader line to the products; it says \"Products\" and below it \"(after the reaction)\", with \"Products\" colored green and underlined. Along the lower part of this equation box are stylized ball-and-stick molecule models and atomic orbital drawings: a silver-gray sphere labeled \"Fe\" sits left of center, another cluster shows gray, red, and white spheres representing sulfate groups around blue and green atoms, and a copper-colored sphere appears near the right. Small atom-and-orbit icons sit along the bottom edge of the panel in blue, green, and brown outline styles. The middle portion is enclosed by a large dashed green rounded rectangle titled \"REACTIVITY CONCEPT\" in green uppercase letters with decorative rays. On the left side of this section, a stepped vertical reactivity-series ladder is drawn with alternating colored horizontal blocks. From top to bottom it lists \"K\", \"Na\", \"Ca\", \"Mg\", \"Al\", \"Zn\", \"Fe\" with a green oval callout reading \"(More reactive)\", then continues downward with \"Cu\", \"Ag\", \"Hg\", \"Pt\", \"Au\" with an orange oval callout reading \"(Less reactive)\". Each step is marked by a dark upward-pointing triangular arrow, showing decreasing reactivity downward. In the central-right area, full body text as follows: \"Iron (Fe) is higher in the reactivity series than Copper (Cu). This makes Iron more reactive.\" Below this definition is a visual arrow sequence of overlapping circles: orange \"Fe\" overlaps blue \"Cu\", followed by a red arrow pointing toward the phrase \"→ More displacement ↓ less reactivity\". Under it, a prominent statement in dark handwriting reads \"More reactive element displaces less reactive element\", emphasized with a bright pink marker underline. On the right, a shield-like badge with a navy outline and light interior contains the bold contrasting font label \"DISPLACEMENT REACTION\". Below the badge, full body text as follows: \"A more reactive element displaces a less reactive element from its compound.\" The badge includes an internal miniature illustration of circular electron shells and colored particles, reinforcing the chemistry theme. Directly below the reactivity concept box, a smaller rounded rectangular table titled \"PROPERTY COMPARISON\" compares Iron and Copper. The table has three columns: \"IRON (Fe)\", \"COPPER (Cu)\", and a central property column. Row one reads \"Reactivity series position\" with Iron shown as \"Higher (more reactive)\" and Copper shown as \"Lower (less reactive)\". Row two reads \"Displaces hydrogen from acids\" with Iron marked \"Yes\" and Copper marked \"No\". Row three reads \"Displaced by other metals\" with Iron shown as \"Displaced by Zn, Mg, Al, etc.\" and Copper shown as \"Displaced by Fe, Zn, Mg, etc.\". Row four reads \"Oxidation tendency\" with Iron shown as \"Gets oxidized easily\" and Copper shown as \"Does not get oxidized easily\". Row five reads \"Useful property\" with Iron described as \"Used where strength & corrosion resistance needed\" and Copper described as \"Used where conductivity & corrosion resistance needed\". The table uses thin navy grid lines, orange tinting for the iron column, pale blue tinting for the copper column, black condensed handwriting, and green checkmarks next to positive traits and red crosses next to limitations. The lower half introduces a large illustrated experiment section with a cream highlight behind the title \"BEFORE/AFTER IRON NAIL EXPERIMENT\" in bold dark navy uppercase letters. The section is split visually into a left \"Before\" state and a right \"After\" state. On the left, a beaker filled with bright blue solution contains a shiny silver iron nail standing diagonally. The beaker label reads \"CuSO₄(aq)\" in blue, and the bottom label near the nail reads \"Fe(s)\". A rounded annotation box beside the beaker says \"Initial State: Blue Solution & Silver Nail\". Two glass test tubes stand to the right of this beaker: the upper test tube is filled with blue solution and labeled \"CuSO₄(aq)\", while the lower one contains a pale green liquid. Red and blue directional arrows connect these visual elements to explanations: one red arrow points toward the nail with the text \"Copper gets deposited\", and one blue arrow points toward the liquid with the text \"Solution turns pale green\". On the right side of the experiment section, another beaker shows the after state with the iron nail now coated in brown copper deposits. Its solution is faded to a pale greenish-blue, and the beaker label reads \"FeSO₄(aq)\" in green. A nearby rounded annotation box says \"Final State: Pale Green Solution & Brown Coated Nail\". To the far right are additional test tubes and ion symbols: a test tube containing blue liquid labeled \"CuSO₄(aq)\" with the note \"Blue colour due to Cu²⁺ ions\", and a lower test tube containing pale green liquid labeled \"FeSO₄(aq)\" with the note \"Pale green due to Fe²⁺ ions\". Beside them are ion diagrams labeled \"Cu²⁺(aq)\" and \"Fe²⁺(aq)\", shown as colored charged particles encircled by simple electron-shell rings; the copper ion uses blue particles and the iron ion uses green particles. Small sparkles, arrows, and dashed guide lines emphasize the transformation from blue copper sulfate solution to pale green iron sulfate solution. Near the bottom, a horizontal summary strip has a blue star icon followed by the heading \"SUMMARY\". Full body text as follows: \"In this reaction, Iron (Fe) displaces Copper (Cu) from Copper Sulphate (CuSO₄) solution to form Iron(II) Sulphate (FeSO₄) solution and Copper (Cu).\" To the lower left, a bordered key-points box titled \"KEY POINTS\" lists three starred bullet statements: \"Iron is above copper in the reactivity series.\", \"Fe displaces Cu from CuSO₄ solution.\", and \"Result: Blue solution turns pale green; copper metal deposits on iron nail.\" At the very bottom, inside the footer border, spaced text reads \"CHEMISTRY • CHANGE IS EVERYWHERE • TOPPER’S NOTES\", flanked by small leaf-like ornaments and thin horizontal divider lines. The entire page uses dark navy borders and headings, bright highlighter strokes, watercolor shading, realistic glassware illustrations, and playful scientific doodles to present a chemistry lesson clearly and attractively."
@@ -135,7 +135,7 @@ from diffusers.utils import load_image
 from diffusers import QwenImage21Pipeline
 
 pipe = QwenImage21Pipeline.from_pretrained(
-    "Qwen/Qwen-Image-2.1", torch_dtype=torch.bfloat16
+    "Qwen/Qwen-Image-2.1", dtype=torch.bfloat16
 ).to("cuda")
 
 input_image = load_image(
@@ -164,7 +164,7 @@ from PIL import Image
 from diffusers import QwenImage21Pipeline
 
 pipe = QwenImage21Pipeline.from_pretrained(
-    "Qwen/Qwen-Image-2.1", torch_dtype=torch.bfloat16
+    "Qwen/Qwen-Image-2.1", dtype=torch.bfloat16
 ).to("cuda")
 
 images = [Image.open(f"ref_{i}.png") for i in range(3)]
@@ -190,7 +190,7 @@ import torch
 from diffusers import QwenImage21Pipeline
 
 pipe = QwenImage21Pipeline.from_pretrained(
-    "Qwen/Qwen-Image-2.1", torch_dtype=torch.bfloat16
+    "Qwen/Qwen-Image-2.1", dtype=torch.bfloat16
 ).to("cuda")
 
 image = pipe(
@@ -236,6 +236,15 @@ These defaults apply to the original Qwen-Image-2.1 checkpoint. Turbo uses its s
 | `num_inference_steps` | 40 | Number of denoising steps |
 | `width` / `height` | 2048 × 2048 | Native 2K resolution; see aspect ratio table above |
 
+### Gradio Studio
+
+[`studio/`](./studio/) is a local web app for trying every feature above in the browser: text to image, editing with up to 10 reference images, local edits drawn on the image, transparent output and the prompt enhancers. Jobs keep running when you switch tabs or reload the page.
+
+```bash
+pip install -r studio/requirements.txt
+bash studio/run.sh
+```
+
 ## Prompt Rewriting
 
 For best results, we recommend using the official **prompt rewriting models** to expand short prompts into detailed, high-quality descriptions. Two fine-tuned Qwen3.5-VL 9B checkpoints are provided — one for text-to-image, one for image editing — sharing a unified codebase that auto-detects the mode from input.
@@ -252,6 +261,7 @@ prompt_rewrite/
 ├── serve.sh + client.py      # vLLM server + client
 ├── pe_core.py                # Task profiles, parsing, output records
 ├── requirements.txt
+├── prompts/                  # System prompt for each task
 └── data/                     # Example inputs (t2i + edit with images)
 ```
 
@@ -272,14 +282,17 @@ python run_transformers.py --task t2i \
     --input data/t2i_example.jsonl --output out.jsonl
 ```
 
-Output:
+Each line of `out.jsonl` is one record. The fields used downstream:
 
 ```json
 {
-  "rewritten_prompt": "<long detailed English prompt>",
-  "wh_ratio": "16:9"
+  "positive_prompt": "<long detailed English prompt>",
+  "wh_ratio": "16:9",
+  "parse_ok": true
 }
 ```
+
+See [`prompt_rewrite/README.md`](./prompt_rewrite/README.md#output-format) for the full record.
 
 ### Image Editing
 
@@ -295,13 +308,14 @@ Input format (JSONL):
 {"id": "abc123", "prompt": "make the sky sunset", "input_images": ["images/photo.png"]}
 ```
 
-Output:
+Output record (fields used downstream):
 
 ```json
 {
-  "rewritten_prompt": "Replace the daytime sky with a warm sunset ...",
+  "positive_prompt": "Replace the daytime sky with a warm sunset ...",
   "wh_ratio": "",
-  "ratio_follow": "<image1>"
+  "ratio_follow": "<image1>",
+  "parse_ok": true
 }
 ```
 
@@ -314,6 +328,7 @@ Output:
 CKPT=Qwen/Qwen-Image-2.1-PE-T2I bash serve.sh
 # then:
 python client.py --task t2i --model Qwen/Qwen-Image-2.1-PE-T2I \
+    --system-prompt prompts/system_prompt_t2i.txt \
     "a corgi playing guitar in the rain"
 ```
 
@@ -330,13 +345,14 @@ WH_RATIO_TO_SIZE = {
     "9:16": (1536, 2752),
 }
 
-# After running the rewriter, read the output
-rewrite = {"rewritten_prompt": "...", "wh_ratio": "16:9"}  # from run_vllm.py output
-prompt = rewrite["rewritten_prompt"]
+# After running the rewriter, read a record from its output
+with open("out.jsonl", encoding="utf-8") as f:  # written by run_vllm.py
+    rewrite = json.loads(f.readline())
+prompt = rewrite["positive_prompt"]
 width, height = WH_RATIO_TO_SIZE.get(rewrite["wh_ratio"], (2048, 2048))
 
 pipe = QwenImage21Pipeline.from_pretrained(
-    "Qwen/Qwen-Image-2.1", torch_dtype=torch.bfloat16
+    "Qwen/Qwen-Image-2.1", dtype=torch.bfloat16
 ).to("cuda")
 
 image = pipe(
@@ -357,7 +373,7 @@ For GPUs with limited memory, use model offloading:
 
 ```python
 pipe = QwenImage21Pipeline.from_pretrained(
-    "Qwen/Qwen-Image-2.1", torch_dtype=torch.bfloat16
+    "Qwen/Qwen-Image-2.1", dtype=torch.bfloat16
 )
 pipe.enable_model_cpu_offload()
 ```

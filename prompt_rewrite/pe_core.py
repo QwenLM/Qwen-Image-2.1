@@ -110,7 +110,8 @@ def get_profile(task: str) -> Profile:
 # --------------------------------------------------------------------------- #
 def load_system_prompt(explicit: str | None, ckpt: str | None) -> str:
     """Resolve the system prompt: `--system-prompt` wins, else the checkpoint's
-    own `system_prompt.txt`.
+    own `system_prompt.txt`, read from the checkpoint directory or, when `ckpt`
+    is a Hub id, downloaded from the same Hub repo as the weights.
 
     Preferring the file that ships *inside* the checkpoint is deliberate. The
     expert's answer contract is part of what the weights were trained on, so a
@@ -127,6 +128,19 @@ def load_system_prompt(explicit: str | None, ckpt: str | None) -> str:
         path = Path(ckpt) / "system_prompt.txt"
         if path.is_file():
             return path.read_text(encoding="utf-8").strip()
+        if not Path(ckpt).exists():
+            # Not a local path, so treat it as a Hub id (e.g.
+            # Qwen/Qwen-Image-2.1-PE-T2I); the prompt ships in the weights' repo.
+            from huggingface_hub import hf_hub_download
+
+            try:
+                hub_path = hf_hub_download(ckpt, "system_prompt.txt")
+            except Exception as exc:
+                raise SystemExit(
+                    f"could not fetch system_prompt.txt from Hub repo {ckpt!r} "
+                    f"({type(exc).__name__}: {exc}); pass --system-prompt <file>"
+                ) from exc
+            return Path(hub_path).read_text(encoding="utf-8").strip()
     raise SystemExit(
         "no system prompt: pass --system-prompt <file>, or put system_prompt.txt "
         "in the checkpoint directory. Each task has its own; they are not "

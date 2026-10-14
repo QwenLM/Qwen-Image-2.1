@@ -5,16 +5,16 @@ One prompt from the command line, or a whole JSONL. Output records are identical
 to the offline runners', so online and offline results are interchangeable.
 
     # one t2i prompt
-    python client.py --task t2i --system-prompt t2i_system_prompt.txt \\
+    python client.py --task t2i --system-prompt prompts/system_prompt_t2i.txt \\
         --model Qwen/Qwen-Image-2.1-PE-T2I "a corgi playing guitar in the rain"
 
     # one edit instruction with its source image(s)
-    python client.py --task edit --system-prompt edit_system_prompt.txt \\
+    python client.py --task edit --system-prompt prompts/system_prompt_edit.txt \\
         --model Qwen/Qwen-Image-2.1-PE-I2I --image a.png --image b.png \\
         "put <image1>'s subject into <image2>'s scene"
 
     # a batch, same JSONL format as the offline runners
-    python client.py --task edit --system-prompt edit_system_prompt.txt \\
+    python client.py --task edit --system-prompt prompts/system_prompt_edit.txt \\
         --model Qwen/Qwen-Image-2.1-PE-I2I --input data/edit_example.jsonl --output out.jsonl
 """
 
