@@ -5,16 +5,16 @@ One prompt from the command line, or a whole JSONL. Output records are identical
 to the offline runners', so online and offline results are interchangeable.
 
     # one t2i prompt
-    python client.py --task t2i --system-prompt t2i_system_prompt.txt \\
+    python client.py --task t2i \\
         --model Qwen/Qwen-Image-2.1-PE-T2I "a corgi playing guitar in the rain"
 
     # one edit instruction with its source image(s)
-    python client.py --task edit --system-prompt edit_system_prompt.txt \\
+    python client.py --task edit \\
         --model Qwen/Qwen-Image-2.1-PE-I2I --image a.png --image b.png \\
         "put <image1>'s subject into <image2>'s scene"
 
     # a batch, same JSONL format as the offline runners
-    python client.py --task edit --system-prompt edit_system_prompt.txt \\
+    python client.py --task edit \\
         --model Qwen/Qwen-Image-2.1-PE-I2I --input data/edit_example.jsonl --output out.jsonl
 """
 
@@ -108,9 +108,10 @@ def main() -> int:
     ap.add_argument("--task", required=True, choices=sorted(core.PROFILES))
     ap.add_argument("--model", required=True,
                     help="served-model-name given to serve.sh (its NAME).")
-    ap.add_argument("--system-prompt", required=True,
-                    help="System prompt file for this task. The server holds the "
-                         "weights but not the prompt, so the client must supply it.")
+    ap.add_argument("--system-prompt", default=None,
+                    help="System prompt file (default: system_prompt.txt from "
+                         "--model, as a local directory or Hub id). Required "
+                         "when --model is a custom served-model-name.")
     ap.add_argument("--url", default=os.environ.get("PE_URL"),
                     help="Base URL, e.g. http://localhost:8100/v1 "
                          "(default: built from --host/--port).")
@@ -153,7 +154,7 @@ def main() -> int:
         timeout=args.timeout,
     )
     image_max_pixels = pick(args.image_max_pixels, profile.image_max_pixels)
-    system_prompt = core.load_system_prompt(args.system_prompt, None)
+    system_prompt = core.load_system_prompt(args.system_prompt, args.model)
     url = args.url or f"http://{args.host}:{args.port}/v1"
     client = OpenAI(base_url=url, api_key="dummy")
 
