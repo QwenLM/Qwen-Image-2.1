@@ -49,6 +49,7 @@ Visit the [Qwen-Image-2.1 Pro API page](https://modelstudio.console.alibabacloud
 
 ```bash
 pip install torch>=2.4.0
+pip install torchvision
 pip install transformers>=5.17
 pip install git+https://github.com/huggingface/diffusers
 pip install accelerate
